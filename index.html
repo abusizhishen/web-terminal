@@ -32,7 +32,8 @@
   var curr_line = "";
 
   term.open(document.getElementById('terminal'),false);
-  term.write('web calculate $ ')
+  term.write('web calculate')
+
   term.on('data', (data) => {
     term.write(data);
   });
