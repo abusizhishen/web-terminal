@@ -1,0 +1,72 @@
+<!doctype html>
+<html>
+<head>
+  <link rel="stylesheet" href="xterm.css" />
+  <script src="xterm.min.js"></script>
+</head>
+<body>
+<div id="terminal"></div>
+<script src="require.js"></script>
+<script>
+
+  var term = new Terminal({
+    cols: 100,
+    cursorBlink: true,
+    rows: 120
+  });
+
+  // import { FitAddon } from 'xterm-addon-fit';
+  // const fitAddon = new FitAddon();
+  //term.loadAddon(fitAddon);
+
+  var curr_line = "";
+  var entries = [];
+  // const WebSocket = require('ws');
+  //
+  // var ws = new Websocket("ws://localhost:3000","echo-protocol");
+
+  term.open(document.getElementById('terminal'),true);
+  //term.fit()
+  term.write('web shel $ ')
+  term.on('data', (data) => {
+    term.write(data);
+  });
+  term.textarea.onkeypress = function (e) {
+    term.write(String.fromCharCode(e.keyCode));
+  }
+  // term.prompt = () => {
+  //   if (curr_line){
+  //     let data = {method: "command",command: curr_line};
+  //     ws.send(JSON.stringify(data));
+  //   }
+  // };
+
+  //term.prompt();
+  term.on("key", function (key,ev){
+    if (ev.keyCode === 13){
+      if (curr_line){
+        entries.push(curr_line);
+        term.write("\r\n");
+        term.write(key)
+        //term.prompt();
+      }
+    }else{
+      curr_line += key;
+      term.write(ev)
+    }
+
+  });
+
+  term.on("paste", function (data){
+    curr_line += data;
+    term.write(ev)
+  });
+
+</script>
+
+<script>
+
+
+</script>
+</body>
+</html>
