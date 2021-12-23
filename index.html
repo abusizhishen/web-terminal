@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="cn">
+<head>
+  <link rel="stylesheet" href="xterm.css" />
+  <script crossorigin src="https://unpkg.com/react@17/umd/react.development.js"></script>
+
+  <script crossorigin src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
+  <script src="parser.js"></script>
+  <script src="xterm.min.js"></script>
+  <title></title>
+</head>
+<body>
+<div id="root"></div>
+<div id="terminal"></div>
+
+<script>
+  (function(React) {
+    return React.__SECRET_DOM_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
+  });
+
+  var term = new Terminal({
+    cols: 100,
+    cursorBlink: true,
+    rows: 120,
+    cursorStyle:"block"
+  });
+
+  // import { FitAddon } from 'xterm-addon-fit';
+  // const fitAddon = new FitAddon();
+  //term.loadAddon(fitAddon);
+
+  var curr_line = "";
+
+  term.open(document.getElementById('terminal'),false);
+  term.write('web calculate $ ')
+  term.on('data', (data) => {
+    term.write(data);
+  });
+  term.textarea.onkeypress = function (e) {
+    term.write(String.fromCharCode(e.keyCode));
+  }
+
+  var shellprompt = '$  ';
+  term.prompt = function () {
+    term.write('\r\n' + shellprompt);
+  };
+
+  term.prompt();
+  term.setOption('cursorBlink', true);
+
+  var result;
+  term.on("key", function (key,ev){
+    if (ev.keyCode === 13) {
+      if(curr_line === 'clear')
+      {
+        term.clear();
+        curr_line = "";
+        return;
+      }
+
+      term.prompt();
+
+      if (curr_line === ""){
+        curr_line = ""
+        term.prompt();
+        return
+      }
+      console.log(curr_line)
+      try {
+        result = calculate(curr_line)
+        term.write(result.toString());
+      }
+      catch(err) {
+        term.write("无效的输入"+curr_line);
+      }
+
+      curr_line = "";
+      term.prompt();
+    } else if (ev.keyCode === 8) {
+      console.log(term.rows);
+      if (term.x > 2) {
+        term.write('\b \b');
+      }
+    }else{
+      curr_line += key
+    }
+
+
+    function calculate(str) {
+      let lexer = new Lexer(str);
+      tokens = lexer.parser();
+      parser = new Parser(tokens)
+      let ast = parser.nextExpression()
+      return ast.value()
+    }
+  });
+
+  term.on("paste", function (data){
+    curr_line += data;
+    term.write(ev)
+  });
+
+</script>
+
+<script>
+
+
+</script>
+</body>
+</html>
